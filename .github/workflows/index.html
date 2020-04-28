@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>COVID-19 Terminology</title>
+
+    <style>
+
+ .node circle {
+   fill: #999;
+   stroke: #ccc;
+   stroke-width: 1px;
+   r: 2;
+ }
+
+ .node text { 
+   font: 10px sans-serif;
+   
+ }
+
+ .link {
+   fill: none;
+   stroke: #ccc;
+   stroke-width: 1px;
+ }
+
+ .node {
+   cursor: pointer; 
+ }
+ 
+    </style>
+
+  </head>
+
+  <body>
+
+<!-- load the d3.js library --> 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+ 
+<script>
+
+var treeData = [
+  {
+    "name": "covid19",
+    "parent": "null",
+    "children": [
+      {
+        "name": "microbial space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "viral",
+            "parent": "microbial space"
+          },
+          {
+            "name": "airborne",
+            "parent": "microbial space",
+            "children": [
+              {
+                "icon": "./img/test.jpg",
+                "parent": "airborne"
+              }
+              ]
+          },
+          {
+            "name": "permeable surface",
+            "parent": "microbial space"
+          },
+          {
+            "name": "hand washing",
+            "parent": "microbial space"
+          },
+          {
+            "name": "testing",
+            "parent": "microbial space"
+          },
+          {
+            "name": "positive/negative",
+            "parent": "microbial space"
+          },
+          {
+            "name": "sanitize",
+            "parent": "microbial space"
+          },
+          {
+            "name": "personal protection equipment",
+            "parent": "microbial space"
+          },
+          {
+            "name": "swab",
+            "parent": "microbial space"
+          },
+          {
+            "name": "vaccinate",
+            "parent": "microbial space"
+          },
+          {
+            "name": "incubation period",
+            "parent": "microbial space"
+          },
+          {
+            "name": "suppression",
+            "parent": "microbial space"
+          },
+          {
+            "name": "r-naught",
+            "parent": "microbial space"
+          }
+        ]
+      },
+      {
+        "name": "personal space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "work from home",
+            "parent": "personal space"
+          },
+          {
+            "name": "technology/digital space",
+            "parent": "personal space"
+          },
+          {
+            "name": "shared space",
+            "parent": "personal space"
+          },
+          {
+            "name": "6 feet/2 meters",
+            "parent": "personal space"
+          },
+          {
+            "name": "stay home",
+            "parent": "personal space"
+          },
+          {
+            "name": "bubble space",
+            "parent": "personal space"
+          },
+          {
+            "name": "zooming",
+            "parent": "personal space"
+          },
+          {
+            "name": "panic attack",
+            "parent": "personal space"
+          },
+          {
+            "name": "exercise",
+            "parent": "personal space"
+          },
+          {
+            "name": "online learning",
+            "parent": "personal space"
+          },
+          {
+            "name": "self-quarantine",
+            "parent": "personal space"
+          },
+          {
+            "name": "physical distance",
+            "parent": "personal space"
+          },
+          {
+            "name": "emergency alerts",
+            "parent": "personal space"
+          },
+          {
+            "name": "televisit",
+            "parent": "personal space"
+          }
+        ]
+      },
+      {
+        "name": "social space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "vulnerable populations",
+            "parent": "social space"
+          },
+          {
+            "name": "essential workers",
+            "parent": "social space"
+          },
+          {
+            "name": "social distancing",
+            "parent": "social space"
+          },
+          {
+            "name": "virtual space",
+            "parent": "social space"
+          },
+          {
+            "name": "shut down",
+            "parent": "social space"
+          },
+          {
+            "name": "isolating",
+            "parent": "social space"
+          },
+          {
+            "name": "shuttered",
+            "parent": "social space"
+          },
+          {
+            "name": "socializing",
+            "parent": "social space"
+          },
+          {
+            "name": "isolation",
+            "parent": "social space"
+          },
+          {
+            "name": "collective action",
+            "parent": "social space"
+          },
+          {
+            "name": "postponed/cancelled",
+            "parent": "social space"
+          },
+          {
+            "name": "new normal",
+            "parent": "social space"
+          },
+          {
+            "name": "neighborhood",
+            "parent": "social space"
+          },
+          {
+            "name": "social network",
+            "parent": "social space"
+          },
+          {
+            "name": "infodemic",
+            "parent": "social space"
+          }
+        ]
+      },
+      {
+        "name": "urban space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "places of burial",
+            "parent": "urban space"
+          },
+          {
+            "name": "makeshift",
+            "parent": "urban space"
+          },
+          {
+            "name": "public spaces",
+            "parent": "urban space"
+          },
+          {
+            "name": "park",
+            "parent": "urban space"
+          },
+          {
+            "name": "pedestrianized streets",
+            "parent": "urban space"
+          },
+          {
+            "name": "pause",
+            "parent": "urban space"
+          },
+          {
+            "name": "increase capacity",
+            "parent": "urban space"
+          },
+          {
+            "name": "overwhelm",
+            "parent": "urban space"
+          },
+          {
+            "name": "corporate businesses",
+            "parent": "urban space"
+          },
+          {
+            "name": "temporary shelter",
+            "parent": "urban space"
+          },
+          {
+            "name": "bailout",
+            "parent": "urban space"
+          },
+          {
+            "name": "local businesses",
+            "parent": "urban space"
+          },
+          {
+            "name": "adaptability/online services",
+            "parent": "urban space"
+          }
+        ]
+      },
+      {
+        "name": "infrastructural space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "environmental effects",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "public infrastructure",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "mutual aid network",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "lockdown",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "critical infrastructure",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "airport",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "essential work",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "abundance of caution",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "caution",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "non-essential",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "mitigation",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "restricted movement",
+            "parent": "infrastructural space"
+          }
+        ]
+      },
+      {
+        "name": "global space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "quarantine impact on economy",
+            "parent": "global space"
+          },
+          {
+            "name": "zoological rehabilitation",
+            "parent": "global space"
+          },
+          {
+            "name": "exponential growth",
+            "parent": "global space"
+          },
+          {
+            "name": "supply chain",
+            "parent": "global space"
+          },
+          {
+            "name": "pandemic",
+            "parent": "global space"
+          },
+          {
+            "name": "spreading at the rate of development",
+            "parent": "global space"
+          },
+          {
+            "name": "epicenter",
+            "parent": "global space"
+          },
+          {
+            "name": "chinese virus",
+            "parent": "global space"
+          },
+          {
+            "name": "super spreader",
+            "parent": "global space"
+          },
+          {
+            "name": "barring entry",
+            "parent": "global space"
+          },
+          {
+            "name": "containment",
+            "parent": "global space"
+          },
+          {
+            "name": "recession/bear market",
+            "parent": "global space"
+          },
+          {
+            "name": "airport",
+            "parent": "global space"
+          }
+        ]
+      },
+    ]
+  }
+];
+
+// ************** Generate the tree diagram  *****************
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+ width = 960 - margin.right - margin.left,
+ height = 800 - margin.top - margin.bottom;
+ 
+var i = 0;
+
+var tree = d3.layout.tree()
+ .size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+ .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+ .attr("width", width + margin.right + margin.left)
+ .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+ .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+root = treeData[0];
+  
+update(root);
+
+    
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+   links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Declare the nodesâ€¦
+  var node = svg.selectAll("g.node")
+   .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter the nodes.
+  var nodeEnter = node.enter().append("g")
+   .attr("class", "node")
+   .attr("transform", function(d) { 
+    return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeEnter.append("circle")
+   .attr("r", 10)
+   .style("fill", "#fff");
+
+  nodeEnter.append("text")
+   .attr("x", function(d) { 
+    return d.children || d._children ? -13 : 13; })
+   .attr("dy", ".35em")
+   .attr("text-anchor", function(d) { 
+    return d.children || d._children ? "end" : "start"; })
+   .text(function(d) { return d.name; })
+   .style("fill-opacity", 1);
+
+  // Declare the linksâ€¦
+  var link = svg.selectAll("path.link")
+   .data(links, function(d) { return d.target.id; });
+
+  // Enter the links.
+  link.enter().insert("path", "g")
+   .attr("class", "link")
+   .attr("d", diagonal);
+    
+  // Toggle children on click.
+  function click(d) {
+      if (d.children) {
+          d._children = d.children;
+          d.children = null;
+      }
+      else {
+          d.chilren = d._children;
+          d._children = null;
+      }
+      update(source);
+  }
+
+  nodeEnter.append("image")
+      .attr("xlink:href", function(d) { return d.icon; })
+      .attr("x", "-50px")
+      .attr("y", "-50px")
+      .attr("width", "100px")
+      .attr("height", "100px");
+}
+
+</script>
+ 
+  </body>
+</html>
