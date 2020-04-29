@@ -541,13 +541,12 @@ var treeData = [
   }
 ];
     
-dx = 10
-
-dy = width / 6
-    
-margin = ({top: 10, right: 120, bottom: 10, left: 40})
-    
-d3 = require("d3@5")
+d3.layout.tree()
+    .size([200,200]);
+    .config({
+        data: treeData
+    })
+    .render();
 
 </script>
       
