@@ -39,7 +39,520 @@
 <script src="d3.v3.min.js"></script>
       
 <text>"Hello World"</text>
+ 
+<script>
+chart = {
+  const root = d3.hierarchy(data);
+
+  root.x0 = dy / 2;
+  root.y0 = 0;
+  root.descendants().forEach((d, i) => {
+    d.id = i;
+    d._children = d.children;
+    if (d.depth && d.data.name.length !== 7) d.children = null;
+  });
+
+  const svg = d3.create("svg")
+      .attr("viewBox", [-margin.left, -margin.top, width, dx])
+      .style("font", "10px sans-serif")
+      .style("user-select", "none");
+
+  const gLink = svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke", "#555")
+      .attr("stroke-opacity", 0.4)
+      .attr("stroke-width", 1.5);
+
+  const gNode = svg.append("g")
+      .attr("cursor", "pointer")
+      .attr("pointer-events", "all");
+
+  function update(source) {
+    const duration = d3.event && d3.event.altKey ? 2500 : 250;
+    const nodes = root.descendants().reverse();
+    const links = root.links();
+
+    // Compute the new tree layout.
+    tree(root);
+
+    let left = root;
+    let right = root;
+    root.eachBefore(node => {
+      if (node.x < left.x) left = node;
+      if (node.x > right.x) right = node;
+    });
+
+    const height = right.x - left.x + margin.top + margin.bottom;
+
+    const transition = svg.transition()
+        .duration(duration)
+        .attr("viewBox", [-margin.left, left.x - margin.top, width, height])
+        .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
+
+    // Update the nodes…
+    const node = gNode.selectAll("g")
+      .data(nodes, d => d.id);
+
+    // Enter any new nodes at the parent's previous position.
+    const nodeEnter = node.enter().append("g")
+        .attr("transform", d => `translate(${source.y0},${source.x0})`)
+        .attr("fill-opacity", 0)
+        .attr("stroke-opacity", 0)
+        .on("click", d => {
+          d.children = d.children ? null : d._children;
+          update(d);
+        });
+
+    nodeEnter.append("circle")
+        .attr("r", 2.5)
+        .attr("fill", d => d._children ? "#555" : "#999")
+        .attr("stroke-width", 10);
+
+    nodeEnter.append("text")
+        .attr("dy", "0.31em")
+        .attr("x", d => d._children ? -6 : 6)
+        .attr("text-anchor", d => d._children ? "end" : "start")
+        .text(d => d.data.name)
+      .clone(true).lower()
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 3)
+        .attr("stroke", "white");
+
+    // Transition nodes to their new position.
+    const nodeUpdate = node.merge(nodeEnter).transition(transition)
+        .attr("transform", d => `translate(${d.y},${d.x})`)
+        .attr("fill-opacity", 1)
+        .attr("stroke-opacity", 1);
+
+    // Transition exiting nodes to the parent's new position.
+    const nodeExit = node.exit().transition(transition).remove()
+        .attr("transform", d => `translate(${source.y},${source.x})`)
+        .attr("fill-opacity", 0)
+        .attr("stroke-opacity", 0);
+
+    // Update the links…
+    const link = gLink.selectAll("path")
+      .data(links, d => d.target.id);
+
+    // Enter any new links at the parent's previous position.
+    const linkEnter = link.enter().append("path")
+        .attr("d", d => {
+          const o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+        });
+
+    // Transition links to their new position.
+    link.merge(linkEnter).transition(transition)
+        .attr("d", diagonal);
+
+    // Transition exiting nodes to the parent's new position.
+    link.exit().transition(transition).remove()
+        .attr("d", d => {
+          const o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+        });
+
+    // Stash the old positions for transition.
+    root.eachBefore(d => {
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+  }
+
+  update(root);
+
+  return svg.node();
+}      
+
+diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x)
+    
+tree = d3.tree().nodeSize([dx, dy])
+    
+data = FileAttachment("flare-2.json").json()
+
+var treeData = [
+  {
+    "name": "covid19",
+    "parent": "null",
+    "children": [
+      {
+        "name": "microbial space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "viral",
+            "parent": "microbial space"
+          },
+          {
+            "name": "airborne",
+            "parent": "microbial space",
+            "children": [
+              {
+                "icon": "./img/test.jpg",
+                "parent": "airborne"
+              }
+              ]
+          },
+          {
+            "name": "permeable surface",
+            "parent": "microbial space"
+          },
+          {
+            "name": "hand washing",
+            "parent": "microbial space"
+          },
+          {
+            "name": "testing",
+            "parent": "microbial space"
+          },
+          {
+            "name": "positive/negative",
+            "parent": "microbial space"
+          },
+          {
+            "name": "sanitize",
+            "parent": "microbial space"
+          },
+          {
+            "name": "personal protection equipment",
+            "parent": "microbial space"
+          },
+          {
+            "name": "swab",
+            "parent": "microbial space"
+          },
+          {
+            "name": "vaccinate",
+            "parent": "microbial space"
+          },
+          {
+            "name": "incubation period",
+            "parent": "microbial space"
+          },
+          {
+            "name": "suppression",
+            "parent": "microbial space"
+          },
+          {
+            "name": "r-naught",
+            "parent": "microbial space"
+          }
+        ]
+      },
+      {
+        "name": "personal space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "work from home",
+            "parent": "personal space"
+          },
+          {
+            "name": "technology/digital space",
+            "parent": "personal space"
+          },
+          {
+            "name": "shared space",
+            "parent": "personal space"
+          },
+          {
+            "name": "6 feet/2 meters",
+            "parent": "personal space"
+          },
+          {
+            "name": "stay home",
+            "parent": "personal space"
+          },
+          {
+            "name": "bubble space",
+            "parent": "personal space"
+          },
+          {
+            "name": "zooming",
+            "parent": "personal space"
+          },
+          {
+            "name": "panic attack",
+            "parent": "personal space"
+          },
+          {
+            "name": "exercise",
+            "parent": "personal space"
+          },
+          {
+            "name": "online learning",
+            "parent": "personal space"
+          },
+          {
+            "name": "self-quarantine",
+            "parent": "personal space"
+          },
+          {
+            "name": "physical distance",
+            "parent": "personal space"
+          },
+          {
+            "name": "emergency alerts",
+            "parent": "personal space"
+          },
+          {
+            "name": "televisit",
+            "parent": "personal space"
+          }
+        ]
+      },
+      {
+        "name": "social space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "vulnerable populations",
+            "parent": "social space"
+          },
+          {
+            "name": "essential workers",
+            "parent": "social space"
+          },
+          {
+            "name": "social distancing",
+            "parent": "social space"
+          },
+          {
+            "name": "virtual space",
+            "parent": "social space"
+          },
+          {
+            "name": "shut down",
+            "parent": "social space"
+          },
+          {
+            "name": "isolating",
+            "parent": "social space"
+          },
+          {
+            "name": "shuttered",
+            "parent": "social space"
+          },
+          {
+            "name": "socializing",
+            "parent": "social space"
+          },
+          {
+            "name": "isolation",
+            "parent": "social space"
+          },
+          {
+            "name": "collective action",
+            "parent": "social space"
+          },
+          {
+            "name": "postponed/cancelled",
+            "parent": "social space"
+          },
+          {
+            "name": "new normal",
+            "parent": "social space"
+          },
+          {
+            "name": "neighborhood",
+            "parent": "social space"
+          },
+          {
+            "name": "social network",
+            "parent": "social space"
+          },
+          {
+            "name": "infodemic",
+            "parent": "social space"
+          }
+        ]
+      },
+      {
+        "name": "urban space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "places of burial",
+            "parent": "urban space"
+          },
+          {
+            "name": "makeshift",
+            "parent": "urban space"
+          },
+          {
+            "name": "public spaces",
+            "parent": "urban space"
+          },
+          {
+            "name": "park",
+            "parent": "urban space"
+          },
+          {
+            "name": "pedestrianized streets",
+            "parent": "urban space"
+          },
+          {
+            "name": "pause",
+            "parent": "urban space"
+          },
+          {
+            "name": "increase capacity",
+            "parent": "urban space"
+          },
+          {
+            "name": "overwhelm",
+            "parent": "urban space"
+          },
+          {
+            "name": "corporate businesses",
+            "parent": "urban space"
+          },
+          {
+            "name": "temporary shelter",
+            "parent": "urban space"
+          },
+          {
+            "name": "bailout",
+            "parent": "urban space"
+          },
+          {
+            "name": "local businesses",
+            "parent": "urban space"
+          },
+          {
+            "name": "adaptability/online services",
+            "parent": "urban space"
+          }
+        ]
+      },
+      {
+        "name": "infrastructural space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "environmental effects",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "public infrastructure",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "mutual aid network",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "lockdown",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "critical infrastructure",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "airport",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "essential work",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "abundance of caution",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "caution",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "non-essential",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "mitigation",
+            "parent": "infrastructural space"
+          },
+          {
+            "name": "restricted movement",
+            "parent": "infrastructural space"
+          }
+        ]
+      },
+      {
+        "name": "global space",
+        "parent": "covid19",
+        "children": [
+          {
+            "name": "quarantine impact on economy",
+            "parent": "global space"
+          },
+          {
+            "name": "zoological rehabilitation",
+            "parent": "global space"
+          },
+          {
+            "name": "exponential growth",
+            "parent": "global space"
+          },
+          {
+            "name": "supply chain",
+            "parent": "global space"
+          },
+          {
+            "name": "pandemic",
+            "parent": "global space"
+          },
+          {
+            "name": "spreading at the rate of development",
+            "parent": "global space"
+          },
+          {
+            "name": "epicenter",
+            "parent": "global space"
+          },
+          {
+            "name": "chinese virus",
+            "parent": "global space"
+          },
+          {
+            "name": "super spreader",
+            "parent": "global space"
+          },
+          {
+            "name": "barring entry",
+            "parent": "global space"
+          },
+          {
+            "name": "containment",
+            "parent": "global space"
+          },
+          {
+            "name": "recession/bear market",
+            "parent": "global space"
+          },
+          {
+            "name": "airport",
+            "parent": "global space"
+          }
+        ]
+      },
+    ]
+  }
+];
+    
+dx = 10
+
+dy = width / 6
+    
+margin = ({top: 10, right: 120, bottom: 10, left: 40})
+    
+d3 = require("d3@5")
+
+</script>
       
+      
+<!--      
 <script>
 
 var treeData = [
@@ -500,6 +1013,7 @@ function update(source) {
 }
 
 </script>
+-->
  
   </body>
 </html>
